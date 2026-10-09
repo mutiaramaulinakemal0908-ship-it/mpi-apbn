@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MPI APBN - Instrumen Kebijakan Fiskal | Ekonomi Kelas XII</title>
+  
+  <!-- Fonts & Tailwind CSS CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              DEFAULT: '#0B192C',
+              dark: '#060E18',
+              light: '#1E3E62',
+              card: '#132A4A'
+            },
+            cyan: {
+              DEFAULT: '#008DDA',
+              hover: '#0072B2'
+            },
+            accent: {
+              yellow: '#FFC107',
+              orange: '#FF9D23'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Touch optimization */
+    * {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B192C;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1E3E62;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #008DDA;
+    }
+
+    /* Flip Card Animation */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+
+    /* Pulse Glow */
+    .glow-effect {
+      box-shadow: 0 0 20px rgba(0, 141, 218, 0.35);
+    }
+    
+    .glow-gold {
+      box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+    }
+
+    /* Drag over highlight */
+    .drag-over {
+      border-color: #008DDA !important;
+      background-color: rgba(0, 141, 218, 0.15) !important;
+      transform: scale(1.01);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans bg-navy overflow-x-hidden text-slate-100 antialiased selection:bg-cyan selection:text-white">
+
+  <!-- ==================== IDENTITAS SISWA (untuk pemantauan guru) ==================== -->
+  <div id="login-overlay" class="fixed inset-0 z-[100] bg-navy-dark/95 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-navy-card border border-slate-700 rounded-2xl p-6 space-y-4 shadow-2xl">
+      <div class="text-center space-y-1">
+        <div class="w-12 h-12 mx-auto rounded-xl bg-gradient-to-tr from-cyan to-blue-600 flex items-center justify-center text-white text-xl"><i class="fa-solid fa-scale-balanced"></i></div>
+        <h2 class="text-xl font-extrabold text-white">Sebelum mulai</h2>
+        <p class="text-xs text-slate-400">Isi identitasmu dulu ya. Aktivitas dan jawabanmu di media ini akan terlihat oleh gurumu.</p>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1" for="in-nama">Nama (panggilan juga boleh)</label>
+          <input id="in-nama" type="text" maxlength="40" autocomplete="off" class="w-full bg-navy-dark border border-slate-700 rounded-lg p-3 text-sm text-white focus:border-cyan focus:outline-none" placeholder="Contoh: Rina" />
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="col-span-2">
+            <label class="block text-xs font-bold text-slate-300 mb-1" for="in-kelas">Kelas</label>
+            <input id="in-kelas" type="text" maxlength="14" autocomplete="off" class="w-full bg-navy-dark border border-slate-700 rounded-lg p-3 text-sm text-white focus:border-cyan focus:outline-none" placeholder="Contoh: XII-1" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1" for="in-absen">No. Absen</label>
+            <input id="in-absen" type="number" min="1" max="99" inputmode="numeric" class="w-full bg-navy-dark border border-slate-700 rounded-lg p-3 text-sm text-white focus:border-cyan focus:outline-none" placeholder="12" />
+          </div>
+        </div>
+        <p id="login-error" class="hidden text-xs text-rose-400 font-semibold"></p>
+        <p id="login-testmode" class="hidden text-[11px] text-amber-400">Mode uji: URL Google Sheets belum diisi, jadi data belum terkirim ke guru.</p>
+      </div>
+      <button onclick="mulaiSesi()" class="w-full bg-gradient-to-r from-cyan to-blue-600 hover:from-cyan-hover hover:to-blue-700 text-white font-bold p-3.5 rounded-xl shadow-lg min-h-[48px]">
+        <i class="fa-solid fa-circle-play mr-2"></i>MULAI
+      </button>
+    </div>
+  </div>
+
+  <!-- Top Navigation Header -->
+  <header class="h-16 bg-navy-dark border-b border-slate-800 flex items-center justify-between px-4 lg:px-8 shrink-0 z-30 sticky top-0">
+    <div class="flex items-center space-x-3">
+      <button id="btn-sidebar-toggle" onclick="toggleSidebar()" class="p-2.5 rounded-lg bg-navy-light text-cyan hover:bg-cyan hover:text-white transition-all text-xl focus:outline-none min-w-[48px] min-h-[48px] flex items-center justify-center">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="flex items-center space-x-2">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-cyan to-blue-600 flex items-center justify-center font-bold text-white text-lg shadow-md">
+          <i class="fa-solid fa-scale-balanced"></i>
+        </div>
+        <div class="hidden sm:block">
+          <h1 class="text-base font-bold leading-tight text-white">APBN FISKAL</h1>
+          <p class="text-xs text-slate-400">MPI Ekonomi Class XII Fase F</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Step Title & Global Progress Bar -->
+    <div class="flex-1 max-w-xl mx-4 hidden md:block">
+      <div class="flex justify-between items-center text-xs mb-1">
+        <span id="header-step-title" class="font-semibold text-cyan truncate">1. Beranda & Ringkasan</span>
+        <span id="header-progress-text" class="text-slate-400 font-mono">Modul <span id="current-page-num">1</span> dari 20</span>
+      </div>
+      <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700/50">
+        <div id="global-progress-bar" class="h-full bg-gradient-to-r from-cyan via-blue-500 to-accent-yellow rounded-full transition-all duration-500" style="width: 5%;"></div>
+      </div>
+    </div>
+
+    <!-- User Quick Score & Actions -->
+    <div class="flex items-center space-x-2 sm:space-x-4">
+      <div class="bg-navy-card border border-slate-700/60 rounded-lg px-3 py-1.5 flex items-center space-x-2">
+        <i class="fa-solid fa-star text-accent-yellow text-sm"></i>
+        <span class="text-xs text-slate-300 hidden sm:inline">Skor:</span>
+        <span id="global-score" class="font-bold font-mono text-accent-yellow text-sm">0</span>
+      </div>
+      <button onclick="goToPage(17)" class="bg-gradient-to-r from-cyan to-blue-600 hover:from-cyan-hover hover:to-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition-all shadow-md flex items-center space-x-1.5 min-h-[44px]">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <span class="hidden sm:inline">Kuis Akhir</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- Sidebar Drawer Overlay -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+
+    <!-- Sidebar Drawer Navigation -->
+    <aside id="sidebar" class="fixed top-16 bottom-0 left-0 w-80 bg-navy-dark border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+      <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-navy/50">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-map text-cyan"></i>
+          <h2 class="font-bold text-slate-200">Daftar Modul & Aktivitas</h2>
+        </div>
+        <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-2 min-w-[44px]">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-3 space-y-1" id="sidebar-nav-list">
+        <!-- Javascript populated navigation items -->
+      </div>
+
+      <div class="p-4 border-t border-slate-800 bg-navy-card/50 text-xs text-slate-400 flex justify-between items-center">
+        <span>Fase F Kelas XII SMA</span>
+        <span class="bg-slate-800 px-2 py-1 rounded text-cyan font-mono">100% Interaktif</span>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto relative p-3 sm:p-6 lg:p-8 flex flex-col justify-between" id="main-content-scroll">
+      
+      <div id="pages-container" class="max-w-6xl mx-auto w-full flex-1">
+
+        <!-- ==================== PAGE 1: BERANDA ==================== -->
+        <section id="page-1" class="page-content space-y-6 animate-fadeIn">
+          <div class="relative bg-gradient-to-br from-navy-card via-navy-light to-navy border border-slate-700/70 rounded-2xl p-6 sm:p-10 overflow-hidden shadow-2xl">
+            <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none text-cyan">
+              <i class="fa-solid fa-building-columns text-[280px]"></i>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+              <div class="lg:col-span-7 space-y-4">
+                <div class="inline-flex items-center space-x-2 bg-cyan/10 border border-cyan/30 text-cyan px-3 py-1 rounded-full text-xs font-semibold">
+                  <span class="w-2 h-2 rounded-full bg-cyan animate-ping"></span>
+                  <span>Ekonomi Kelas XII Fase F</span>
+                </div>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+                  APBN SEBAGAI <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan to-accent-yellow">INSTRUMEN FISKAL</span>
+                </h1>
+                <p class="text-amber-400 font-medium text-lg italic">
+                  “Dari Anggaran Negara ke Dampak bagi Masyarakat”
+                </p>
+                <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                  Selamat datang, <strong class="text-cyan">Ekonom Muda!</strong> Mari telusuri bagaimana anggaran negara dirancang, dialokasikan, dan menjadi mesin utama penggerak kesejahteraan masyarakat.
+                </p>
+
+                <!-- Action Button Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4">
+                  <button onclick="goToPage(2)" class="col-span-2 sm:col-span-1 bg-gradient-to-r from-cyan to-blue-600 hover:from-cyan-hover hover:to-blue-700 text-white font-bold p-3.5 rounded-xl text-center shadow-lg hover:shadow-cyan/30 transition-all flex items-center justify-center space-x-2 min-h-[52px]">
+                    <i class="fa-solid fa-circle-play text-lg"></i>
+                    <span>MULAI BELAJAR</span>
+                  </button>
+                  <button onclick="goToPage(7)" class="bg-navy-light hover:bg-slate-700 text-slate-100 font-semibold p-3 rounded-xl border border-slate-600 text-center transition-all flex items-center justify-center space-x-2 min-h-[52px]">
+                    <i class="fa-solid fa-gamepad text-accent-yellow"></i>
+                    <span>MAIN GAME</span>
+                  </button>
+                  <button onclick="goToPage(13)" class="bg-navy-light hover:bg-slate-700 text-slate-100 font-semibold p-3 rounded-xl border border-slate-600 text-center transition-all flex items-center justify-center space-x-2 min-h-[52px]">
+                    <i class="fa-solid fa-brain text-purple-400"></i>
+                    <span>TANTANGAN HOTS</span>
+                  </button>
+                  <button onclick="goToPage(4)" class="bg-navy-light hover:bg-slate-700 text-slate-100 font-semibold p-3 rounded-xl border border-slate-600 text-center transition-all flex items-center justify-center space-x-2 min-h-[52px]">
+                    <i class="fa-solid fa-book-open text-emerald-400"></i>
+                    <span>MATERI</span>
+                  </button>
+                  <button onclick="goToPage(18)" class="col-span-2 sm:col-span-1 bg-navy-light hover:bg-slate-700 text-slate-100 font-semibold p-3 rounded-xl border border-slate-600 text-center transition-all flex items-center justify-center space-x-2 min-h-[52px]">
+                    <i class="fa-solid fa-trophy text-amber-400"></i>
+                    <span>HASIL BELAJAR</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Avatar & Visual -->
+              <div class="lg:col-span-5 flex flex-col items-center justify-center">
+                <div class="relative w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-gradient-to-tr from-cyan/20 to-accent-yellow/20 p-2 border-2 border-dashed border-cyan/40 flex items-center justify-center">
+                  <div class="w-full h-full rounded-full bg-navy-card flex flex-col items-center justify-center p-4 text-center relative overflow-hidden glow-effect">
+                    <div class="text-6xl sm:text-7xl mb-2">🧑‍💼</div>
+                    <span class="bg-cyan text-slate-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Ekonom Muda</span>
+                    <p class="text-[11px] text-slate-400 mt-2">Karakter Analis Fiskal</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Flow Summary Cards -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-navy-card p-4 rounded-xl border border-slate-800 text-center">
+              <span class="text-2xl mb-1 block">💡</span>
+              <h2 class="text-xs font-bold text-cyan">MEMAHAMI</h2>
+              <p class="text-[11px] text-slate-400 mt-1">Konsep & Fungsi APBN</p>
+            </div>
+            <div class="bg-navy-card p-4 rounded-xl border border-slate-800 text-center">
+              <span class="text-2xl mb-1 block">🔍</span>
+              <h2 class="text-xs font-bold text-cyan">MENGANALISIS</h2>
+              <p class="text-[11px] text-slate-400 mt-1">Komponen & Kebijakan</p>
+            </div>
+            <div class="bg-navy-card p-4 rounded-xl border border-slate-800 text-center">
+              <span class="text-2xl mb-1 block">⚖️</span>
+              <h2 class="text-xs font-bold text-cyan">MENGAMBIL KEPUTUSAN</h2>
+              <p class="text-[11px] text-slate-400 mt-1">Prioritas Anggaran</p>
+            </div>
+            <div class="bg-navy-card p-4 rounded-xl border border-slate-800 text-center">
+              <span class="text-2xl mb-1 block">🌱</span>
+              <h2 class="text-xs font-bold text-cyan">MEREFLEKSI</h2>
+              <p class="text-[11px] text-slate-400 mt-1">Dampak Bagi Publik</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 2: MISI PEMBELAJARAN ==================== -->
+        <section id="page-2" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <div class="max-w-3xl">
+              <div class="flex items-center space-x-3 text-cyan mb-2">
+                <i class="fa-solid fa-compass text-xl"></i>
+                <h2 class="text-xl font-bold uppercase tracking-wider">Peran & Misi Utama</h2>
+              </div>
+              <p class="text-slate-300 text-base leading-relaxed mb-6">
+                “Bayangkan kamu menjadi seorang <strong>Analis Anggaran Pemerintah</strong>. Kebutuhan masyarakat semakin banyak, tetapi anggaran negara terbatas. Tugasmu adalah memahami APBN dan membantu menentukan prioritas anggaran.”
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Mission 1 -->
+              <div onclick="goToPage(4)" class="group cursor-pointer bg-navy-light/60 hover:bg-navy-light border border-slate-700 hover:border-cyan p-5 rounded-xl transition-all duration-300 relative overflow-hidden">
+                <div class="flex items-start justify-between">
+                  <div class="w-12 h-12 rounded-lg bg-cyan/20 text-cyan flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform">
+                    01
+                  </div>
+                  <span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300">Konsep</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mt-4 group-hover:text-cyan transition-colors">MISI 1 — Kenali APBN</h3>
+                <p class="text-xs text-slate-300 mt-2">Pelajari definisi, alur, dan 6 fungsi penting APBN bagi kestabilan negara.</p>
+                <div class="mt-4 text-xs font-bold text-cyan flex items-center space-x-1">
+                  <span>Mulai Misi</span>
+                  <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </div>
+              </div>
+
+              <!-- Mission 2 -->
+              <div onclick="goToPage(6)" class="group cursor-pointer bg-navy-light/60 hover:bg-navy-light border border-slate-700 hover:border-cyan p-5 rounded-xl transition-all duration-300 relative overflow-hidden">
+                <div class="flex items-start justify-between">
+                  <div class="w-12 h-12 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform">
+                    02
+                  </div>
+                  <span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300">Struktur</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mt-4 group-hover:text-emerald-400 transition-colors">MISI 2 — Bedah Komponen APBN</h3>
+                <p class="text-xs text-slate-300 mt-2">Telusuri sumber Penerimaan, pos Belanja, dan mekanisme Pembiayaan negara.</p>
+                <div class="mt-4 text-xs font-bold text-emerald-400 flex items-center space-x-1">
+                  <span>Mulai Misi</span>
+                  <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </div>
+              </div>
+
+              <!-- Mission 3 -->
+              <div onclick="goToPage(8)" class="group cursor-pointer bg-navy-light/60 hover:bg-navy-light border border-slate-700 hover:border-cyan p-5 rounded-xl transition-all duration-300 relative overflow-hidden">
+                <div class="flex items-start justify-between">
+                  <div class="w-12 h-12 rounded-lg bg-amber-500/20 text-accent-yellow flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform">
+                    03
+                  </div>
+                  <span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300">Analisis</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mt-4 group-hover:text-accent-yellow transition-colors">MISI 3 — Analisis Kebutuhan Masy.</h3>
+                <p class="text-xs text-slate-300 mt-2">Alokasikan poin anggaran ke sektor pendidikan, kesehatan, dan infrastruktur.</p>
+                <div class="mt-4 text-xs font-bold text-accent-yellow flex items-center space-x-1">
+                  <span>Mulai Misi</span>
+                  <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </div>
+              </div>
+
+              <!-- Mission 4 -->
+              <div onclick="goToPage(11)" class="group cursor-pointer bg-navy-light/60 hover:bg-navy-light border border-slate-700 hover:border-cyan p-5 rounded-xl transition-all duration-300 relative overflow-hidden">
+                <div class="flex items-start justify-between">
+                  <div class="w-12 h-12 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform">
+                    04
+                  </div>
+                  <span class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300">Keputusan</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mt-4 group-hover:text-purple-400 transition-colors">MISI 4 — Pengambil Keputusan</h3>
+                <p class="text-xs text-slate-300 mt-2">Simulasikan peran Menteri Keuangan dalam memprioritaskan proposal pembangunan.</p>
+                <div class="mt-4 text-xs font-bold text-purple-400 flex items-center space-x-1">
+                  <span>Mulai Misi</span>
+                  <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 3: APERSEPSI INTERAKTIF ==================== -->
+        <section id="page-3" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <h2 class="text-2xl font-bold text-white mb-4">Apersepsi: Dari Mana Asalnya?</h2>
+            
+            <!-- Facility Showcase Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+              <div class="bg-navy p-3 rounded-xl border border-slate-700/50 text-center">
+                <span class="text-3xl block mb-1">🏫</span>
+                <span class="text-xs font-semibold text-slate-300">Sekolah</span>
+              </div>
+              <div class="bg-navy p-3 rounded-xl border border-slate-700/50 text-center">
+                <span class="text-3xl block mb-1">🏥</span>
+                <span class="text-xs font-semibold text-slate-300">Rumah Sakit</span>
+              </div>
+              <div class="bg-navy p-3 rounded-xl border border-slate-700/50 text-center">
+                <span class="text-3xl block mb-1">🛣️</span>
+                <span class="text-xs font-semibold text-slate-300">Jalan Raya</span>
+              </div>
+              <div class="bg-navy p-3 rounded-xl border border-slate-700/50 text-center">
+                <span class="text-3xl block mb-1">🚌</span>
+                <span class="text-xs font-semibold text-slate-300">Transportasi</span>
+              </div>
+              <div class="bg-navy p-3 rounded-xl border border-slate-700/50 text-center col-span-2 sm:col-span-1">
+                <span class="text-3xl block mb-1">🛡️</span>
+                <span class="text-xs font-semibold text-slate-300">Layanan Publik</span>
+              </div>
+            </div>
+
+            <div class="bg-navy-light/80 border border-cyan/30 rounded-xl p-5 mb-6">
+              <p class="text-base sm:text-lg font-bold text-white mb-2">
+                ❓ Pertanyaan Pemantik:
+              </p>
+              <p class="text-slate-200 text-sm sm:text-base">
+                “Menurutmu, dari mana pemerintah memperoleh dana untuk membiayai semua fasilitas dan pelayanan masyarakat di atas?”
+              </p>
+            </div>
+
+            <!-- Quiz Options -->
+            <div class="space-y-3" id="apersepsi-options">
+              <button onclick="checkApersepsi('A')" class="w-full text-left p-4 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 transition-all flex items-start space-x-3 min-h-[52px]">
+                <span class="bg-slate-700 text-white font-bold w-7 h-7 rounded-lg flex items-center justify-center shrink-0">A</span>
+                <span class="text-sm sm:text-base text-slate-200 pt-0.5">Murni berasal dari Pajak Masyarakat saja.</span>
+              </button>
+
+              <button onclick="checkApersepsi('B')" class="w-full text-left p-4 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 transition-all flex items-start space-x-3 min-h-[52px]">
+                <span class="bg-slate-700 text-white font-bold w-7 h-7 rounded-lg flex items-center justify-center shrink-0">B</span>
+                <span class="text-sm sm:text-base text-slate-200 pt-0.5">Penerimaan Negara (Pajak & Non-Pajak) serta sumber Pembiayaan lainnya yang sah.</span>
+              </button>
+
+              <button onclick="checkApersepsi('C')" class="w-full text-left p-4 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 transition-all flex items-start space-x-3 min-h-[52px]">
+                <span class="bg-slate-700 text-white font-bold w-7 h-7 rounded-lg flex items-center justify-center shrink-0">C</span>
+                <span class="text-sm sm:text-base text-slate-200 pt-0.5">Mencetak uang sebanyak-banyaknya kapan pun dibutuhkan.</span>
+              </button>
+            </div>
+
+            <!-- Feedback Modal / Box -->
+            <div id="apersepsi-feedback" class="mt-6 hidden p-5 rounded-xl border transition-all">
+              <div class="flex items-center space-x-3 mb-2">
+                <i id="apersepsi-icon" class="text-2xl"></i>
+                <h3 id="apersepsi-title" class="font-bold text-lg"></h3>
+              </div>
+              <p id="apersepsi-text" class="text-sm leading-relaxed text-slate-200"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 4: MATERI 1 - APA ITU APBN ==================== -->
+        <section id="page-4" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <span class="text-xs font-bold text-cyan uppercase tracking-wider">Modul Materi 01</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1 mb-4">Pengertian & Alur Kerja APBN</h2>
+            
+            <div class="bg-gradient-to-r from-blue-900/40 to-navy-light p-5 rounded-xl border-l-4 border-cyan mb-8">
+              <p class="text-base sm:text-lg text-slate-100 font-medium">
+                “<strong>APBN (Anggaran Pendapatan dan Belanja Negara)</strong> adalah rencana keuangan tahunan pemerintah negara yang disetujui oleh Dewan Perwakilan Rakyat (DPR).”
+              </p>
+            </div>
+
+            <!-- Interactive Flow Diagram -->
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4">Diagram Alir Anggaran Negara</h3>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 relative mb-8">
+              <div class="bg-navy p-4 rounded-xl border border-slate-700 text-center hover:border-cyan transition-all">
+                <span class="text-2xl block mb-2">💰</span>
+                <h4 class="font-bold text-xs text-cyan">1. PENERIMAAN</h4>
+                <p class="text-[11px] text-slate-400 mt-1">Pajak, PNBP, Hibah</p>
+              </div>
+              <div class="hidden md:flex items-center justify-center text-cyan text-xl">➔</div>
+
+              <div class="bg-navy p-4 rounded-xl border border-slate-700 text-center hover:border-cyan transition-all">
+                <span class="text-2xl block mb-2">🏛️</span>
+                <h4 class="font-bold text-xs text-amber-400">2. APBN</h4>
+                <p class="text-[11px] text-slate-400 mt-1">Persetujuan DPR</p>
+              </div>
+              <div class="hidden md:flex items-center justify-center text-cyan text-xl">➔</div>
+
+              <div class="bg-navy p-4 rounded-xl border border-slate-700 text-center hover:border-cyan transition-all">
+                <span class="text-2xl block mb-2">🏗️</span>
+                <h4 class="font-bold text-xs text-emerald-400">3. BELANJA</h4>
+                <p class="text-[11px] text-slate-400 mt-1">Program & Subsidies</p>
+              </div>
+            </div>
+
+            <!-- Explain with your own words button -->
+            <div class="border-t border-slate-800 pt-6">
+              <button onclick="toggleOwnWordsModal()" class="bg-cyan hover:bg-cyan-hover text-slate-900 font-bold px-5 py-3 rounded-xl transition-all shadow-lg flex items-center space-x-2 min-h-[48px]">
+                <i class="fa-solid fa-comments"></i>
+                <span>Coba Jelaskan dengan Bahasamu</span>
+              </button>
+
+              <div id="own-words-box" class="hidden mt-4 p-5 bg-navy rounded-xl border border-cyan/40">
+                <label class="block text-sm font-bold text-slate-200 mb-2">
+                  💭 Menurutmu, mengapa APBN sangat penting bagi kelangsungan hidup masyarakat sehari-hari?
+                </label>
+                <textarea id="own-words-input" rows="3" class="w-full bg-navy-dark border border-slate-700 rounded-lg p-3 text-slate-100 text-sm focus:border-cyan focus:outline-none" placeholder="Tuliskan pemahamanmu di sini..."></textarea>
+                <button onclick="saveOwnWords()" class="mt-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg text-xs">Simpan Refleksi Ringkas</button>
+                <p id="own-words-saved" class="text-xs text-emerald-400 mt-2 hidden">✓ Catatan tersimpan dalam sesi belajar ini!</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 5: MATERI 2 - FUNGSI APBN ==================== -->
+        <section id="page-5" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <span class="text-xs font-bold text-cyan uppercase tracking-wider">Modul Materi 02</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1 mb-2">6 Fungsi Utama APBN</h2>
+            <p class="text-slate-300 text-sm mb-6">Klik kartu di bawah ini untuk melihat penjelasan dan contoh nyata dalam kehidupan sehari-hari.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <!-- Card 1 -->
+              <div onclick="flipCard(this)" class="cursor-pointer bg-navy p-5 rounded-xl border border-slate-700 hover:border-cyan transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-cyan bg-cyan/10 px-2 py-0.5 rounded">Fungsi 1</span>
+                    <i class="fa-solid fa-key text-slate-400 group-hover:text-cyan"></i>
+                  </div>
+                  <h3 class="font-bold text-base text-white">1. OTORISASI</h3>
+                  <p class="text-xs text-slate-300 mt-2 card-front">Anggaran negara menjadi dasar untuk melaksanakan pendapatan dan belanja pada tahun yang bersangkutan.</p>
+                  <p class="text-xs text-cyan mt-2 hidden card-back">💡 <i>Contoh:</i> Pemerintah tidak boleh mengeluarkan dana tanpa persetujuan undang-undang APBN.</p>
+                </div>
+                <div class="text-[11px] text-slate-300 mt-3 font-semibold underline">Klik detail contoh</div>
+              </div>
+
+              <!-- Card 2 -->
+              <div onclick="flipCard(this)" class="cursor-pointer bg-navy p-5 rounded-xl border border-slate-700 hover:border-cyan transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">Fungsi 2</span>
+                    <i class="fa-solid fa-[#008DDA] text-slate-400 group-hover:text-amber-400"></i>
+                  </div>
+                  <h3 class="font-bold text-base text-white">2. PERENCANAAN</h3>
+                  <p class="text-xs text-slate-300 mt-2 card-front">Pedoman bagi pemerintah untuk merencanakan kegiatan proyek pembangunan pada tahun berjalan.</p>
+                  <p class="text-xs text-amber-300 mt-2 hidden card-back">💡 <i>Contoh:</i> Merencanakan pembangunan tol, bendungan, atau renovasi sekolah tahunan.</p>
+                </div>
+                <div class="text-[11px] text-slate-300 mt-3 font-semibold underline">Klik detail contoh</div>
+              </div>
+
+              <!-- Card 3 -->
+              <div onclick="flipCard(this)" class="cursor-pointer bg-navy p-5 rounded-xl border border-slate-700 hover:border-cyan transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-purple-400 bg-purple-400/10 px-2 py-0.5 rounded">Fungsi 3</span>
+                    <i class="fa-solid fa-magnifying-glass text-slate-400 group-hover:text-purple-400"></i>
+                  </div>
+                  <h3 class="font-bold text-base text-white">3. PENGAWASAN</h3>
+                  <p class="text-xs text-slate-300 mt-2 card-front">Pedoman untuk menilai apakah kegiatan penyelenggaraan pemerintah sesuai dengan ketentuan.</p>
+                  <p class="text-xs text-purple-300 mt-2 hidden card-back">💡 <i>Contoh:</i> DPR dan BPK memeriksa apakah realisasi anggaran sesuai dengan rencana awal.</p>
+                </div>
+                <div class="text-[11px] text-slate-300 mt-3 font-semibold underline">Klik detail contoh</div>
+              </div>
+
+              <!-- Card 4 -->
+              <div onclick="flipCard(this)" class="cursor-pointer bg-navy p-5 rounded-xl border border-slate-700 hover:border-cyan transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">Fungsi 4</span>
+                    <i class="fa-solid fa-pie-chart text-slate-400 group-hover:text-emerald-400"></i>
+                  </div>
+                  <h3 class="font-bold text-base text-white">4. ALOKASI</h3>
+                  <p class="text-xs text-slate-300 mt-2 card-front">Diarahkan untuk mengurangi pengangguran dan pemborosan sumber daya, serta meningkatkan efisiensi.</p>
+                  <p class="text-xs text-emerald-300 mt-2 hidden card-back">💡 <i>Contoh:</i> Mengalokasikan dana khusus 20% untuk pendidikan dan sektor kesehatan publik.</p>
+                </div>
+                <div class="text-[11px] text-slate-300 mt-3 font-semibold underline">Klik detail contoh</div>
+              </div>
+
+              <!-- Card 5 -->
+              <div onclick="flipCard(this)" class="cursor-pointer bg-navy p-5 rounded-xl border border-slate-700 hover:border-cyan transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-pink-400 bg-pink-400/10 px-2 py-0.5 rounded">Fungsi 5</span>
+                    <i class="fa-solid fa-hand-holding-heart text-slate-400 group-hover:text-pink-400"></i>
+                  </div>
+                  <h3 class="font-bold text-base text-white">5. DISTRIBUSI</h3>
+                  <p class="text-xs text-slate-300 mt-2 card-front">Kebijakan anggaran negara harus memperhatikan rasa keadilan dan kepatutan antar daerah & warga.</p>
+                  <p class="text-xs text-pink-300 mt-2 hidden card-back">💡 <i>Contoh:</i> Pemberian subsidi listrik, Program Keluarga Harapan (PKH), dan beasiswa KIP.</p>
+                </div>
+                <div class="text-[11px] text-slate-300 mt-3 font-semibold underline">Klik detail contoh</div>
+              </div>
+
+              <!-- Card 6 -->
+              <div onclick="flipCard(this)" class="cursor-pointer bg-navy p-5 rounded-xl border border-slate-700 hover:border-cyan transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-cyan bg-cyan/10 px-2 py-0.5 rounded">Fungsi 6</span>
+                    <i class="fa-solid fa-scale-balanced text-slate-400 group-hover:text-cyan"></i>
+                  </div>
+                  <h3 class="font-bold text-base text-white">6. STABILISASI</h3>
+                  <p class="text-xs text-slate-300 mt-2 card-front">Alat untuk memelihara dan mengupayakan keseimbangan fundamental perekonomian negara.</p>
+                  <p class="text-xs text-cyan mt-2 hidden card-back">💡 <i>Contoh:</i> Menambah belanja publik saat terjadi krisis ekonomi agar daya beli masyarakat terjaga.</p>
+                </div>
+                <div class="text-[11px] text-slate-300 mt-3 font-semibold underline">Klik detail contoh</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 6: MATERI 3 - KOMPONEN APBN ==================== -->
+        <section id="page-6" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <span class="text-xs font-bold text-cyan uppercase tracking-wider">Modul Materi 03</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1 mb-6">Tiga Komponen Utama APBN</h2>
+
+            <!-- Interactive Component Tabs -->
+            <div class="flex border-b border-slate-700 space-x-2 overflow-x-auto pb-1 mb-6">
+              <button onclick="switchComponentTab('penerimaan')" id="tab-btn-penerimaan" class="px-4 py-2.5 rounded-t-lg font-bold text-sm bg-cyan text-slate-900 flex items-center space-x-2 shrink-0">
+                <span>💰 PENERIMAAN</span>
+              </button>
+              <button onclick="switchComponentTab('belanja')" id="tab-btn-belanja" class="px-4 py-2.5 rounded-t-lg font-bold text-sm bg-navy text-slate-400 hover:text-white flex items-center space-x-2 shrink-0">
+                <span>🏗️ BELANJA</span>
+              </button>
+              <button onclick="switchComponentTab('pembiayaan')" id="tab-btn-pembiayaan" class="px-4 py-2.5 rounded-t-lg font-bold text-sm bg-navy text-slate-400 hover:text-white flex items-center space-x-2 shrink-0">
+                <span>📊 PEMBIAYAAN</span>
+              </button>
+            </div>
+
+            <!-- Tab Content: Penerimaan -->
+            <div id="tab-penerimaan" class="space-y-4">
+              <h3 class="text-lg font-bold text-cyan">Sumber Penerimaan Negara</h3>
+              <p class="text-sm text-slate-300">Semua pendapatan yang masuk ke kas negara untuk membiayai pengeluaran umum.</p>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                <div class="bg-navy p-4 rounded-xl border border-slate-700">
+                  <h4 class="font-bold text-white text-sm">1. Perpajakan</h4>
+                  <p class="text-xs text-slate-300 mt-1">PPN, PPh, Bea Cukai, Pajak Bumi & Bangunan (PBB).</p>
+                </div>
+                <div class="bg-navy p-4 rounded-xl border border-slate-700">
+                  <h4 class="font-bold text-white text-sm">2. PNBP</h4>
+                  <p class="text-xs text-slate-300 mt-1">Penerimaan Negara Bukan Pajak (Dividen BUMN, SDA, Layanan paspor/SIM).</p>
+                </div>
+                <div class="bg-navy p-4 rounded-xl border border-slate-700">
+                  <h4 class="font-bold text-white text-sm">3. Hibah</h4>
+                  <p class="text-xs text-slate-300 mt-1">Pemberian sukarela tanpa kewajiban mengembalikan dari dalam/luar negeri.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Content: Belanja -->
+            <div id="tab-belanja" class="space-y-4 hidden">
+              <h3 class="text-lg font-bold text-emerald-400">Pos Belanja Negara</h3>
+              <p class="text-sm text-slate-300">Pengeluaran kas negara untuk menjalankan fungsi pemerintah dan pelayanan publik.</p>
+              
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+                <div class="bg-navy p-3.5 rounded-xl border border-slate-700">
+                  <span class="text-xs text-emerald-400 font-bold block">Pendidikan</span>
+                  <span class="text-xs text-slate-300">Sekolah, Gaji Guru, Beasiswa</span>
+                </div>
+                <div class="bg-navy p-3.5 rounded-xl border border-slate-700">
+                  <span class="text-xs text-emerald-400 font-bold block">Kesehatan</span>
+                  <span class="text-xs text-slate-300">Rumah Sakit, BPJS, Obat</span>
+                </div>
+                <div class="bg-navy p-3.5 rounded-xl border border-slate-700">
+                  <span class="text-xs text-emerald-400 font-bold block">Infrastruktur</span>
+                  <span class="text-xs text-slate-300">Jalan, Jembatan, Irigasi</span>
+                </div>
+                <div class="bg-navy p-3.5 rounded-xl border border-slate-700">
+                  <span class="text-xs text-emerald-400 font-bold block">Perlindungan Sosial</span>
+                  <span class="text-xs text-slate-300">Bantuan Sosial, Bencana</span>
+                </div>
+                <div class="bg-navy p-3.5 rounded-xl border border-slate-700">
+                  <span class="text-xs text-emerald-400 font-bold block">Pertahanan/Keamanan</span>
+                  <span class="text-xs text-slate-300">TNI, Polri, Alutsista</span>
+                </div>
+                <div class="bg-navy p-3.5 rounded-xl border border-slate-700">
+                  <span class="text-xs text-emerald-400 font-bold block">Pelayanan Publik</span>
+                  <span class="text-xs text-slate-300">Administrasi & Birokrasi</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Content: Pembiayaan -->
+            <div id="tab-pembiayaan" class="space-y-4 hidden">
+              <h3 class="text-lg font-bold text-amber-400">Pembiayaan Anggaran</h3>
+              <p class="text-sm text-slate-300">Setiap penerimaan yang perlu dibayar kembali atau pengeluaran yang akan diterima kembali, khususnya untuk menutup defisit anggaran.</p>
+              
+              <div class="bg-navy p-5 rounded-xl border border-slate-700 space-y-3">
+                <div class="flex items-center space-x-3">
+                  <i class="fa-solid fa-scale-unbalanced text-amber-400 text-xl"></i>
+                  <span class="font-bold text-white text-sm">Bagaimana jika Belanja > Penerimaan? (Defisit)</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  Pemerintah akan menggunakan instrumen Pembiayaan seperti penerbitan Surat Berharga Negara (SBN/SUTANG), pinjaman dalam/luar negeri, atau penggunaan Sisa Lebih Pembiayaan Anggaran (SiLPA).
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 7: GAME 1 - PILAH ANGGARANNYA ==================== -->
+        <section id="page-7" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+              <div>
+                <span class="text-xs font-bold text-accent-yellow uppercase tracking-wider">Permainan 01</span>
+                <h2 class="text-2xl font-extrabold text-white">🎮 Pilah Anggarannya!</h2>
+              </div>
+              <button onclick="resetGame1()" class="bg-navy hover:bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-lg border border-slate-700 flex items-center space-x-1.5 min-h-[44px]">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>Coba Lagi</span>
+              </button>
+            </div>
+
+            <p class="text-xs sm:text-sm text-slate-300 mb-6">
+              Seret (Drag & Drop) atau Klik/Tap kartu item di bawah ke dalam wadah kategori anggaran yang sesuai.
+            </p>
+
+            <!-- Cards Pool -->
+            <div id="g1-card-pool" class="bg-navy/80 p-4 rounded-xl border border-slate-800 flex flex-wrap gap-2.5 min-h-[100px] mb-6">
+              <!-- Dynamically populated cards -->
+            </div>
+
+            <!-- Target Drop Zones -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Zone 1: Penerimaan -->
+              <div id="zone-penerimaan" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="handleDrop(event, 'PENERIMAAN')" class="bg-navy border-2 border-dashed border-emerald-500/40 p-4 rounded-xl min-h-[180px] flex flex-col">
+                <div class="flex items-center space-x-2 text-emerald-400 mb-3 font-bold text-sm">
+                  <span>🟢</span>
+                  <span>PENERIMAAN</span>
+                </div>
+                <div class="zone-items flex-1 flex flex-col gap-2"></div>
+              </div>
+
+              <!-- Zone 2: Belanja -->
+              <div id="zone-belanja" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="handleDrop(event, 'BELANJA')" class="bg-navy border-2 border-dashed border-cyan/40 p-4 rounded-xl min-h-[180px] flex flex-col">
+                <div class="flex items-center space-x-2 text-cyan mb-3 font-bold text-sm">
+                  <span>🔵</span>
+                  <span>BELANJA</span>
+                </div>
+                <div class="zone-items flex-1 flex flex-col gap-2"></div>
+              </div>
+
+              <!-- Zone 3: Pembiayaan -->
+              <div id="zone-pembiayaan" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="handleDrop(event, 'PEMBIAYAAN')" class="bg-navy border-2 border-dashed border-amber-500/40 p-4 rounded-xl min-h-[180px] flex flex-col">
+                <div class="flex items-center space-x-2 text-amber-400 mb-3 font-bold text-sm">
+                  <span>🟠</span>
+                  <span>PEMBIAYAAN</span>
+                </div>
+                <div class="zone-items flex-1 flex flex-col gap-2"></div>
+              </div>
+            </div>
+
+            <!-- Game Result Box -->
+            <div id="g1-result" class="mt-6 p-5 rounded-xl bg-navy border border-slate-700 hidden">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-white text-base">Hasil Pemilahan:</h3>
+                <span id="g1-score-badge" class="px-3 py-1 bg-cyan text-slate-900 font-extrabold rounded-full text-xs"></span>
+              </div>
+              <p id="g1-feedback-text" class="text-sm text-slate-300 leading-relaxed"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 8: GAME 2 - KE MANA ANGGARAN PERGI ==================== -->
+        <section id="page-8" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <span class="text-xs font-bold text-accent-yellow uppercase tracking-wider">Permainan 02</span>
+            <h2 class="text-2xl font-extrabold text-white mb-2">📊 Ke Mana Anggaran Pergi?</h2>
+            <p class="text-slate-300 text-sm mb-6">
+              Situasi: Pemerintah memiliki total <strong class="text-cyan">100 Poin Anggaran</strong>. Bagi poin tersebut sesuai pertimbangan prioritas kelompokmu.
+            </p>
+
+            <!-- Remaining Points Header -->
+            <div class="bg-navy p-4 rounded-xl border border-slate-700 flex justify-between items-center mb-6">
+              <span class="text-sm font-bold text-slate-200">Sisa Poin Anggaran:</span>
+              <span id="g2-points-left" class="text-2xl font-extrabold font-mono text-cyan">100</span>
+            </div>
+
+            <!-- Allocation Sliders -->
+            <div class="space-y-4 mb-6">
+              <!-- Sector 1 -->
+              <div class="bg-navy/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                <div class="flex justify-between items-center text-sm font-bold">
+                  <span class="text-slate-200">🏫 Pendidikan</span>
+                  <span id="val-pendidikan" class="text-cyan font-mono">20 Poin</span>
+                </div>
+                <input type="range" id="slider-pendidikan" min="0" max="100" value="20" oninput="updateG2Allocations('pendidikan')" class="w-full accent-cyan cursor-pointer" />
+              </div>
+
+              <!-- Sector 2 -->
+              <div class="bg-navy/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                <div class="flex justify-between items-center text-sm font-bold">
+                  <span class="text-slate-200">🏥 Kesehatan</span>
+                  <span id="val-kesehatan" class="text-cyan font-mono">20 Poin</span>
+                </div>
+                <input type="range" id="slider-kesehatan" min="0" max="100" value="20" oninput="updateG2Allocations('kesehatan')" class="w-full accent-cyan cursor-pointer" />
+              </div>
+
+              <!-- Sector 3 -->
+              <div class="bg-navy/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                <div class="flex justify-between items-center text-sm font-bold">
+                  <span class="text-slate-200">🛣️ Infrastruktur</span>
+                  <span id="val-infrastruktur" class="text-cyan font-mono">20 Poin</span>
+                </div>
+                <input type="range" id="slider-infrastruktur" min="0" max="100" value="20" oninput="updateG2Allocations('infrastruktur')" class="w-full accent-cyan cursor-pointer" />
+              </div>
+
+              <!-- Sector 4 -->
+              <div class="bg-navy/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                <div class="flex justify-between items-center text-sm font-bold">
+                  <span class="text-slate-200">🛡️ Pertahanan & Keamanan</span>
+                  <span id="val-pertahanan" class="text-cyan font-mono">20 Poin</span>
+                </div>
+                <input type="range" id="slider-pertahanan" min="0" max="100" value="20" oninput="updateG2Allocations('pertahanan')" class="w-full accent-cyan cursor-pointer" />
+              </div>
+
+              <!-- Sector 5 -->
+              <div class="bg-navy/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                <div class="flex justify-between items-center text-sm font-bold">
+                  <span class="text-slate-200">🌱 Lingkungan Hidup</span>
+                  <span id="val-lingkungan" class="text-cyan font-mono">20 Poin</span>
+                </div>
+                <input type="range" id="slider-lingkungan" min="0" max="100" value="20" oninput="updateG2Allocations('lingkungan')" class="w-full accent-cyan cursor-pointer" />
+              </div>
+            </div>
+
+            <!-- Submit Allocation -->
+            <button onclick="submitG2Allocation()" class="w-full bg-gradient-to-r from-cyan to-blue-600 hover:from-cyan-hover hover:to-blue-700 text-white font-bold p-3.5 rounded-xl transition-all shadow-lg min-h-[48px]">
+              Kunci Prioritas Anggaran & Lihat Analisis
+            </button>
+
+            <!-- Feedback Dynamic -->
+            <div id="g2-feedback-box" class="mt-6 p-5 rounded-xl bg-navy border border-slate-700 hidden space-y-3">
+              <h3 class="font-bold text-base text-accent-yellow">💡 Analisis Keputusan Anggaranmu:</h3>
+              <p id="g2-analysis-text" class="text-sm text-slate-200 leading-relaxed"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 9: GAME 3 - BENAR ATAU BONGKAR ==================== -->
+        <section id="page-9" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <span class="text-xs font-bold text-accent-yellow uppercase tracking-wider">Permainan 03</span>
+            <h2 class="text-2xl font-extrabold text-white mb-2">⚡ Benar atau Bongkar!</h2>
+            <p class="text-slate-300 text-sm mb-6">Uji pemahaman mitos vs fakta seputar APBN negara.</p>
+
+            <div class="space-y-4" id="g3-statements-list">
+              <!-- Javascript Populated Questions -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 10: STUDI KASUS INTERAKTIF ==================== -->
+        <section id="page-10" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Studi Kasus Interaktif</span>
+            <h2 class="text-2xl font-extrabold text-white mb-2">🏙️ Masalah di Kota Kita</h2>
+            
+            <div class="bg-navy/80 p-5 rounded-xl border border-slate-700 mb-6">
+              <p class="text-sm text-slate-200 leading-relaxed">
+                “Suatu daerah mengalami 4 masalah bersamaan: Fasilitas sekolah belum memadai, layanan kesehatan belum merata, jalan menuju wilayah produksi rusak, dan aktivitas ekonomi melambat.”
+              </p>
+            </div>
+
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-3">Pilih Masalah Utama yang Ingin Mula-Mula Dianalisis:</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+              <button onclick="selectCaseProblem('sekolah')" id="prob-btn-sekolah" class="p-3.5 rounded-xl bg-navy border border-slate-700 hover:border-cyan text-left transition-all min-h-[64px]">
+                <span class="text-xl block mb-1">🏫</span>
+                <span class="text-xs font-bold text-white">Sekolah Rusak</span>
+              </button>
+
+              <button onclick="selectCaseProblem('kesehatan')" id="prob-btn-kesehatan" class="p-3.5 rounded-xl bg-navy border border-slate-700 hover:border-cyan text-left transition-all min-h-[64px]">
+                <span class="text-xl block mb-1">🏥</span>
+                <span class="text-xs font-bold text-white">Layanan Kesehatan</span>
+              </button>
+
+              <button onclick="selectCaseProblem('jalan')" id="prob-btn-jalan" class="p-3.5 rounded-xl bg-navy border border-slate-700 hover:border-cyan text-left transition-all min-h-[64px]">
+                <span class="text-xl block mb-1">🛣️</span>
+                <span class="text-xs font-bold text-white">Jalan Rusak</span>
+              </button>
+
+              <button onclick="selectCaseProblem('ekonomi')" id="prob-btn-ekonomi" class="p-3.5 rounded-xl bg-navy border border-slate-700 hover:border-cyan text-left transition-all min-h-[64px]">
+                <span class="text-xl block mb-1">📉</span>
+                <span class="text-xs font-bold text-white">Ekonomi Melambat</span>
+              </button>
+            </div>
+
+            <!-- Analysis Questions Matrix -->
+            <div id="case-analysis-matrix" class="hidden space-y-4 bg-navy p-5 rounded-xl border border-slate-700">
+              <h4 id="case-selected-title" class="font-bold text-cyan text-base"></h4>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs text-slate-300 mb-1">1. Belanja Pemerintah Apa yang Relevan?</label>
+                  <input id="case-q1" type="text" class="w-full bg-navy-dark border border-slate-700 rounded-lg p-2.5 text-xs text-white" placeholder="Misal: Belanja Modal / Infrastruktur..." />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 mb-1">2. Apa Manfaat Langsung jika Dibiayai APBN?</label>
+                  <input id="case-q2" type="text" class="w-full bg-navy-dark border border-slate-700 rounded-lg p-2.5 text-xs text-white" placeholder="Misal: Kelancaran distribusi barang..." />
+                </div>
+              </div>
+              <button onclick="submitCaseAnalysis()" class="bg-cyan hover:bg-cyan-hover text-slate-900 font-bold px-4 py-2 rounded-lg text-xs min-h-[40px]">
+                Simpan Analisis
+              </button>
+              <p id="case-saved-msg" class="text-xs text-emerald-400 hidden">✓ Analisis berhasil dicatat!</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 11: GAME 4 - JADILAH MENTERI KEUANGAN ==================== -->
+        <section id="page-11" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <span class="text-xs font-bold text-accent-yellow uppercase tracking-wider">Simulasi Keputusan</span>
+            <h2 class="text-2xl font-extrabold text-white mb-2">🏛️ Jadilah Menteri Keuangan!</h2>
+            <p class="text-slate-300 text-sm mb-6">
+              “Selamat! Kamu dipercaya menentukan prioritas anggaran terbatas tahun ini. Pilih satu proposal utama:”
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div onclick="selectMinisterProposal('A')" class="cursor-pointer bg-navy p-5 rounded-xl border border-slate-700 hover:border-cyan transition-all flex flex-col justify-between">
+                <div>
+                  <span class="text-xs font-bold text-cyan bg-cyan/10 px-2 py-0.5 rounded">Proposal A</span>
+                  <h3 class="font-bold text-base text-white mt-2">Peningkatan Fasilitas Pendidikan</h3>
+                  <p class="text-xs text-slate-300 mt-2">Fokus perbaikan sekolah & beasiswa di seluruh pelosok.</p>
+                </div>
+                <button class="mt-4 bg-cyan text-slate-900 text-xs font-bold py-2 rounded-lg min-h-[40px]">PILIH PROPOSAL A</button>
+              </div>
+
+              <div onclick="selectMinisterProposal('B')" class="cursor-pointer bg-navy p-5 rounded-xl border border-slate-700 hover:border-cyan transition-all flex flex-col justify-between">
+                <div>
+                  <span class="text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">Proposal B</span>
+                  <h3 class="font-bold text-base text-white mt-2">Peningkatan Layanan Kesehatan</h3>
+                  <p class="text-xs text-slate-300 mt-2">Fokus modernisasi Puskesmas & jaminan kesehatan warga.</p>
+                </div>
+                <button class="mt-4 bg-emerald-500 text-slate-900 text-xs font-bold py-2 rounded-lg min-h-[40px]">PILIH PROPOSAL B</button>
+              </div>
+
+              <div onclick="selectMinisterProposal('C')" class="cursor-pointer bg-navy p-5 rounded-xl border border-slate-700 hover:border-cyan transition-all flex flex-col justify-between">
+                <div>
+                  <span class="text-xs font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">Proposal C</span>
+                  <h3 class="font-bold text-base text-white mt-2">Pembangunan Infrastruktur</h3>
+                  <p class="text-xs text-slate-300 mt-2">Fokus pembangunan jalan tol, jembatan, & konektivitas.</p>
+                </div>
+                <button class="mt-4 bg-amber-500 text-slate-900 text-xs font-bold py-2 rounded-lg min-h-[40px]">PILIH PROPOSAL C</button>
+              </div>
+            </div>
+
+            <div id="minister-outcome" class="hidden p-5 rounded-xl bg-navy border border-slate-700">
+              <h3 id="minister-outcome-title" class="font-bold text-base text-white mb-2"></h3>
+              <p id="minister-outcome-text" class="text-sm text-slate-300 leading-relaxed"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 12: MATERI 4 - APBN SEBAGAI INSTRUMEN FISKAL ==================== -->
+        <section id="page-12" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <span class="text-xs font-bold text-cyan uppercase tracking-wider">Modul Materi 04</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1 mb-4">Kebijakan Fiskal & APBN</h2>
+            
+            <p class="text-slate-300 text-sm leading-relaxed mb-6">
+              <strong>Kebijakan Fiskal</strong> adalah kebijakan pemerintah untuk memengaruhi perekonomian melalui pengaturan penerimaan (pajak) dan pengeluaran (belanja negara).
+            </p>
+
+            <!-- Policy Scenario Toggle -->
+            <div class="bg-navy p-4 rounded-xl border border-slate-700 mb-6">
+              <h3 class="font-bold text-white text-sm mb-3">Pilih Jenis Kebijakan Fiskal:</h3>
+              <div class="grid grid-cols-2 gap-3">
+                <button onclick="toggleFiscalPolicy('exp')" id="btn-fisc-exp" class="p-3 rounded-lg bg-cyan text-slate-900 font-bold text-xs min-h-[44px]">
+                  Kebijakan Ekspansif (Saat Lesu)
+                </button>
+                <button onclick="toggleFiscalPolicy('con')" id="btn-fisc-con" class="p-3 rounded-lg bg-navy-light text-slate-300 font-bold text-xs hover:text-white min-h-[44px]">
+                  Kebijakan Kontraktif (Saat Inflasi Tinggi)
+                </button>
+              </div>
+            </div>
+
+            <!-- Dynamic Fiscal Explanation -->
+            <div id="fiscal-detail-box" class="p-5 rounded-xl bg-navy border border-cyan/40 space-y-3">
+              <h4 id="fisc-title" class="font-bold text-cyan text-base">Kebijakan Fiskal Ekspansif</h4>
+              <p id="fisc-desc" class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                Dilakukan dengan <strong>meningkatkan belanja negara</strong> dan/atau <strong>menurunkan pajak</strong> untuk mendorong daya beli masyarakat dan menggerakkan dunia usaha.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 13: HOTS LEVEL 1 ==================== -->
+        <section id="page-13" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <div class="flex items-center space-x-2 text-purple-400 mb-2">
+              <i class="fa-solid fa-brain"></i>
+              <span class="text-xs font-bold uppercase tracking-wider">HOTS Level 1 — Analisis</span>
+            </div>
+            <h2 class="text-2xl font-extrabold text-white mb-6">Soal HOTS 01: Analisis Kasus Infrastruktur</h2>
+
+            <div class="bg-navy p-5 rounded-xl border border-slate-700 mb-6 space-y-2">
+              <span class="text-xs font-bold text-cyan">Stimulus Kasus:</span>
+              <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                Pemerintah memutuskan untuk meningkatkan anggaran belanja jalan tol dan pelabuhan sebesar 15% pada saat aktivitas ekonomi domestik mengalami perlambatan akibat penurunan konsumsi rumah tangga.
+              </p>
+            </div>
+
+            <p class="text-sm font-bold text-white mb-4">
+              Alasan yang paling tepat mengapa kebijakan tersebut dapat menjadi instrumen fiskal yang efektif adalah...
+            </p>
+
+            <div class="space-y-3" id="hots1-options">
+              <button onclick="checkHots1('A')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                A. Menurunkan jumlah utang negara secara spontan.
+              </button>
+              <button onclick="checkHots1('B')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                B. Mendorong penyerapan tenaga kerja dan menggerakkan sektor industri konstruksi (Efek Pengganda).
+              </button>
+              <button onclick="checkHots1('C')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                C. Menghapuskan kewajiban membayar pajak bagi seluruh kontraktor.
+              </button>
+              <button onclick="checkHots1('D')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                D. Memastikan tidak ada pengeluaran kas negara pada tahun berjalan.
+              </button>
+            </div>
+
+            <div id="hots1-feedback" class="hidden mt-4 p-4 rounded-xl text-xs leading-relaxed"></div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 14: HOTS LEVEL 2 ==================== -->
+        <section id="page-14" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <div class="flex items-center space-x-2 text-purple-400 mb-2">
+              <i class="fa-solid fa-brain"></i>
+              <span class="text-xs font-bold uppercase tracking-wider">HOTS Level 2 — Analisis Hubungan</span>
+            </div>
+            <h2 class="text-2xl font-extrabold text-white mb-4">Sebab-Akibat Kebijakan Fiskal</h2>
+
+            <div class="bg-navy p-5 rounded-xl border border-slate-700 mb-6">
+              <p class="text-sm font-bold text-cyan mb-2">RantaiHubungan:</p>
+              <p class="text-xs text-slate-200">
+                Peningkatan Belanja Negara ➔ Pengadaan Proyek Publik ➔ Penyerapan Tenaga Kerja ➔ Daya Beli Masyarakat Meningkat.
+              </p>
+            </div>
+
+            <p class="text-sm font-bold text-white mb-4">
+              Jika rantai di atas terputus karena efisiensi penyaluran dana kurang transparan, dampak paling merugikan bagi masyarakat adalah...
+            </p>
+
+            <div class="space-y-3">
+              <button onclick="checkHots2('A')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                A. Anggaran APBN langsung otomatis bertambah dua kali lipat.
+              </button>
+              <button onclick="checkHots2('B')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                B. Manfaat fasilitas publik tidak optimal dan efektivitas belanja fiskal menurun.
+              </button>
+              <button onclick="checkHots2('C')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                C. Seluruh penerimaan pajak akan langsung dihentikan.
+              </button>
+            </div>
+
+            <div id="hots2-feedback" class="hidden mt-4 p-4 rounded-xl text-xs leading-relaxed"></div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 15: HOTS LEVEL 3 ==================== -->
+        <section id="page-15" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <div class="flex items-center space-x-2 text-purple-400 mb-2">
+              <i class="fa-solid fa-brain"></i>
+              <span class="text-xs font-bold uppercase tracking-wider">HOTS Level 3 — Evaluasi Kebijakan</span>
+            </div>
+            <h2 class="text-2xl font-extrabold text-white mb-4">Evaluasi Dilema Anggaran</h2>
+
+            <div class="bg-navy p-5 rounded-xl border border-slate-700 mb-6">
+              <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                “Pemerintah memilih meningkatkan belanja fisik jalan tol, sementara fasilitas kesehatan dasar di pulau terluar masih sangat terbatas.”
+              </p>
+            </div>
+
+            <p class="text-sm font-bold text-white mb-4">Apakah keputusan tersebut dapat dianggap tepat secara mutlak?</p>
+
+            <div class="space-y-3">
+              <button onclick="checkHots3('A')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                A. Tepat karena jalan tol selalu lebih penting.
+              </button>
+              <button onclick="checkHots3('B')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                B. Perlu dievaluasi kembali berdasarkan skala prioritas kebutuhan dasar masyarakat dan dampak jangka panjang.
+              </button>
+              <button onclick="checkHots3('C')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                C. Tidak tepat karena pembangunan fisik tidak pernah bermanfaat.
+              </button>
+            </div>
+
+            <div id="hots3-feedback" class="hidden mt-4 p-4 rounded-xl text-xs leading-relaxed"></div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 16: HOTS LEVEL 4 ==================== -->
+        <section id="page-16" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <div class="flex items-center space-x-2 text-purple-400 mb-2">
+              <i class="fa-solid fa-brain"></i>
+              <span class="text-xs font-bold uppercase tracking-wider">HOTS Level 4 — Pilih Kebijakan Kompleks</span>
+            </div>
+            <h2 class="text-2xl font-extrabold text-white mb-4">Pengambilan Kebijakan Kompleks</h2>
+
+            <div class="bg-navy p-5 rounded-xl border border-slate-700 mb-6 space-y-2">
+              <span class="text-xs font-bold text-amber-400">Kondisi Makro:</span>
+              <ul class="text-xs text-slate-200 list-disc list-inside space-y-1">
+                <li>Pertumbuhan ekonomi melambat.</li>
+                <li>Pengangguran meningkat.</li>
+                <li>Infrastruktur logistik butuh perbaikan.</li>
+                <li>Penerimaan negara dari pajak terbatas.</li>
+              </ul>
+            </div>
+
+            <p class="text-sm font-bold text-white mb-4">Sebagai pengambil keputusan, paket kebijakan fiskal terbaik adalah...</p>
+
+            <div class="space-y-3">
+              <button onclick="checkHots4('A')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                A. Menolak seluruh belanja pembangunan.
+              </button>
+              <button onclick="checkHots4('B')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                B. Kombinasi Reokasi anggaran ke sektor produktif & pembiayaan terukur yang efisien.
+              </button>
+              <button onclick="checkHots4('C')" class="w-full text-left p-3.5 rounded-xl bg-navy hover:bg-slate-800 border border-slate-700 text-xs sm:text-sm text-slate-200 min-h-[48px]">
+                C. Menaikkan tarif semua pajak secara drastis saat ekonomi lesu.
+              </button>
+            </div>
+
+            <div id="hots4-feedback" class="hidden mt-4 p-4 rounded-xl text-xs leading-relaxed"></div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 17: KUIS AKHIR ==================== -->
+        <section id="page-17" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
+              <div>
+                <span class="text-xs font-bold text-cyan uppercase tracking-wider">Evaluasi Akhir</span>
+                <h2 class="text-2xl font-extrabold text-white">📝 Kuis Akhir APBN</h2>
+              </div>
+              <div class="text-xs bg-navy px-3 py-1.5 rounded-lg border border-slate-700 font-mono text-cyan">
+                Soal <span id="quiz-curr-num">1</span> dari 10
+              </div>
+            </div>
+
+            <div id="quiz-box" class="space-y-6">
+              <!-- Dynamically render questions -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 18: HASIL BELAJAR ==================== -->
+        <section id="page-18" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8 text-center">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Rapor Pencapaian</span>
+            <h2 class="text-3xl font-extrabold text-white mt-1 mb-6">🏆 Hasil Belajar Kamu</h2>
+
+            <div class="inline-flex flex-col items-center justify-center w-40 h-40 rounded-full bg-gradient-to-tr from-cyan via-blue-600 to-amber-400 p-1 mb-6 shadow-2xl glow-gold">
+              <div class="w-full h-full bg-navy-card rounded-full flex flex-col items-center justify-center">
+                <span id="final-score-val" class="text-4xl font-extrabold text-amber-400 font-mono">0</span>
+                <span class="text-[10px] text-slate-400">SKOR AKHIR</span>
+              </div>
+            </div>
+
+            <h3 id="final-badge-title" class="text-2xl font-bold text-white mb-2">Penjelajah APBN</h3>
+            <p id="final-badge-desc" class="text-sm text-slate-300 max-w-lg mx-auto mb-8 leading-relaxed"></p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto text-left mb-8">
+              <div class="bg-navy p-4 rounded-xl border border-slate-700">
+                <span class="text-xs text-cyan font-bold block">📚 Pemahaman Konsep</span>
+                <span id="stat-konsep" class="text-sm text-slate-200 mt-1 block">Tercapai</span>
+              </div>
+              <div class="bg-navy p-4 rounded-xl border border-slate-700">
+                <span class="text-xs text-purple-400 font-bold block">🧠 Analisis & Keputusan</span>
+                <span id="stat-analisis" class="text-sm text-slate-200 mt-1 block">Tercapai</span>
+              </div>
+            </div>
+
+            <button onclick="goToPage(19)" class="bg-cyan hover:bg-cyan-hover text-slate-900 font-bold px-6 py-3 rounded-xl transition-all shadow-lg min-h-[48px]">
+              Lanjut ke Refleksi ➔
+            </button>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 19: REFLEKSI ==================== -->
+        <section id="page-19" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-6 sm:p-8">
+            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Refleksi Pembelajaran</span>
+            <h2 class="text-2xl font-extrabold text-white mb-6">🌱 Refleksi Diri</h2>
+
+            <div class="space-y-5">
+              <div>
+                <label class="block text-sm font-bold text-slate-200 mb-2">1. Hal baru yang saya pahami tentang APBN adalah...</label>
+                <textarea id="ref1" rows="2" class="w-full bg-navy border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-cyan focus:outline-none"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-sm font-bold text-slate-200 mb-2">2. Sekarang saya memahami bahwa anggaran negara berhubungan dengan...</label>
+                <textarea id="ref2" rows="2" class="w-full bg-navy border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-cyan focus:outline-none"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-sm font-bold text-slate-200 mb-2">3. Jika saya menjadi pengambil keputusan, saya akan mempertimbangkan...</label>
+                <textarea id="ref3" rows="2" class="w-full bg-navy border border-slate-700 rounded-xl p-3 text-sm text-white focus:border-cyan focus:outline-none"></textarea>
+              </div>
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-3">
+              <button onclick="copyReflection()" class="bg-navy hover:bg-slate-800 text-cyan border border-cyan/40 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center space-x-2 min-h-[44px]">
+                <i class="fa-solid fa-copy"></i>
+                <span>Salin Jawaban Refleksi</span>
+              </button>
+              <button onclick="goToPage(20)" class="bg-cyan hover:bg-cyan-hover text-slate-900 font-bold px-5 py-2.5 rounded-xl text-xs min-h-[44px]">
+                Selesai Pembelajaran ➔
+              </button>
+            </div>
+            <p id="ref-copy-msg" class="text-xs text-emerald-400 hidden mt-2">✓ Jawaban berhasil disalin ke clipboard!</p>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE 20: PENUTUP ==================== -->
+        <section id="page-20" class="page-content space-y-6 hidden">
+          <div class="bg-navy-card border border-slate-700/60 rounded-2xl p-8 text-center space-y-6">
+            <div class="text-5xl">🏛️</div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white">APBN BUKAN SEKADAR ANGKA.</h2>
+            <p class="text-slate-300 text-base max-w-xl mx-auto leading-relaxed italic">
+              “Di balik setiap rupiah anggaran negara, ada pilihan, prioritas, dan dampak nyata bagi masa depan seluruh rakyat Indonesia.”
+            </p>
+
+            <div class="pt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
+              <button onclick="goToPage(1)" class="bg-navy hover:bg-slate-800 border border-slate-700 p-3 rounded-xl text-xs font-bold text-slate-200 min-h-[48px]">
+                🔄 Ulangi Pembelajaran
+              </button>
+              <button onclick="goToPage(7)" class="bg-navy hover:bg-slate-800 border border-slate-700 p-3 rounded-xl text-xs font-bold text-slate-200 min-h-[48px]">
+                🎮 Main Lagi
+              </button>
+              <button onclick="goToPage(13)" class="bg-navy hover:bg-slate-800 border border-slate-700 p-3 rounded-xl text-xs font-bold text-slate-200 min-h-[48px]">
+                🧠 Coba HOTS
+              </button>
+              <button onclick="goToPage(1)" class="bg-cyan hover:bg-cyan-hover p-3 rounded-xl text-xs font-bold text-slate-900 min-h-[48px]">
+                🏠 Kembali Beranda
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Bottom Floating Stepper Navigation Bar -->
+      <div class="max-w-6xl mx-auto w-full mt-6 bg-navy-dark/95 backdrop-blur border border-slate-800 rounded-xl p-3 flex justify-between items-center shrink-0 shadow-lg">
+        <button id="btn-prev-page" onclick="prevPage()" class="bg-navy-light hover:bg-slate-700 text-slate-200 text-xs font-bold px-4 py-2.5 rounded-lg transition-all border border-slate-700 flex items-center space-x-2 min-h-[44px]">
+          <i class="fa-solid fa-chevron-left"></i>
+          <span>Sebelumnya</span>
+        </button>
+
+        <span class="text-xs text-slate-400 font-mono hidden sm:inline">
+          Modul <span id="footer-page-num">1</span> / 20
+        </span>
+
+        <button id="btn-next-page" onclick="nextPage()" class="bg-gradient-to-r from-cyan to-blue-600 hover:from-cyan-hover hover:to-blue-700 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-all flex items-center space-x-2 min-h-[44px]">
+          <span>Lanjut</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    /* Global Application State */
+    let currentPage = 1;
+    const totalPages = 20;
+    let userScore = 0;
+
+    /* =====================================================================
+       PEMANTAUAN GURU via Google Sheets
+       1) Deploy Apps Script (lihat apps_script_pemantauan.gs)
+       2) Tempel URL Web App di SHEETS_URL
+       3) SHEETS_TOKEN harus sama persis dengan TOKEN di Apps Script
+       ===================================================================== */
+    const SHEETS_URL   = "https://script.google.com/macros/s/AKfycbwgpWi68QJpLhFwFFPHmVnJi4FI_B5B-agj1eNGgIFdv-BJXPHwv6ieMIpm6ywO8iC0/exec";
+    const SHEETS_TOKEN = "apbn-xii-2026";
+
+    let siswa = null;          // { nama, kelas, absen }
+    let antrean = [];          // event yang menunggu dikirim
+    let kuisDijawab = 0, kuisBenar = 0, sudahSelesai = false, kasusTerpilih = '';
+    const logAktif = () => SHEETS_URL.indexOf('https://') === 0;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const simpan = JSON.parse(localStorage.getItem('mpi_apbn_siswa') || 'null');
+        if (simpan) {
+          document.getElementById('in-nama').value = simpan.nama || '';
+          document.getElementById('in-kelas').value = simpan.kelas || '';
+          document.getElementById('in-absen').value = simpan.absen || '';
+        }
+      } catch (e) {}
+      if (!logAktif()) document.getElementById('login-testmode').classList.remove('hidden');
+    });
+
+    function mulaiSesi() {
+      const nama  = document.getElementById('in-nama').value.trim();
+      const kelas = document.getElementById('in-kelas').value.trim().toUpperCase();
+      const absen = document.getElementById('in-absen').value.trim();
+      const err = document.getElementById('login-error');
+      if (!nama || !kelas) {
+        err.innerText = 'Nama dan kelas wajib diisi ya.';
+        err.classList.remove('hidden');
+        return;
+      }
+      siswa = { nama, kelas, absen };
+      try { localStorage.setItem('mpi_apbn_siswa', JSON.stringify(siswa)); } catch (e) {}
+      document.getElementById('login-overlay').classList.add('hidden');
+      kirimLog('mulai', 'Membuka media');
+    }
+
+    function kirimLog(jenis, detail, benar) {
+      if (!siswa) return;
+      // setTimeout 0: tunggu fungsi pemanggil selesai (mis. addScore) supaya skor yang tercatat sudah terbaru
+      setTimeout(() => {
+        antrean.push({
+          t: Date.now(), jenis,
+          detail: String(detail === undefined || detail === null ? '' : detail).slice(0, 500),
+          benar: (benar === undefined) ? null : benar,
+          halaman: currentPage, modul: pageTitles[currentPage - 1],
+          skor: userScore, kuisDijawab, kuisBenar, selesai: sudahSelesai
+        });
+      }, 0);
+    }
+
+    function kirimAntrean(keepalive) {
+      if (!siswa || antrean.length === 0) return;
+      const paket = antrean.splice(0, antrean.length);
+      if (!logAktif()) { console.log('[MPI mode uji] data tidak dikirim:', paket); return; }
+      fetch(SHEETS_URL, {
+        method: 'POST', mode: 'no-cors', keepalive: !!keepalive,
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ token: SHEETS_TOKEN, siswa, events: paket })
+      }).catch(() => { antrean.unshift(...paket); });   // gagal (offline)? coba lagi di putaran berikutnya
+    }
+    setInterval(() => kirimAntrean(false), 3000);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') kirimAntrean(true); });
+    window.addEventListener('pagehide', () => kirimAntrean(true));
+    /* ===================== akhir blok pemantauan ===================== */
+
+    // List of 20 Module Titles
+    const pageTitles = [
+      "1. Beranda",
+      "2. Misi Pembelajaran",
+      "3. Apersepsi Interaktif",
+      "4. Apa Itu APBN?",
+      "5. Fungsi APBN",
+      "6. Komponen APBN",
+      "7. Game: Pilah Anggaran",
+      "8. Game: Alokasi Anggaran",
+      "9. Game: Benar/Bongkar",
+      "10. Studi Kasus Kota Kita",
+      "11. Game: Menteri Keuangan",
+      "12. Kebijakan Fiskal",
+      "13. HOTS 1: Analisis",
+      "14. HOTS 2: Hubungan",
+      "15. HOTS 3: Evaluasi",
+      "16. HOTS 4: Keputusan",
+      "17. Kuis Akhir APBN",
+      "18. Hasil Belajar",
+      "19. Refleksi Pembelajaran",
+      "20. Penutup"
+    ];
+
+    /* Initialize Application */
+    window.onload = function() {
+      buildSidebarNav();
+      initGame1();
+      initGame3();
+      initQuiz();
+      updatePageVisibility();
+    };
+
+    /* Navigation Drawer Functions */
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    }
+
+    function buildSidebarNav() {
+      const list = document.getElementById('sidebar-nav-list');
+      list.innerHTML = '';
+      pageTitles.forEach((title, idx) => {
+        const pageNum = idx + 1;
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium transition-all flex items-center justify-between min-h-[44px] ${pageNum === currentPage ? 'bg-cyan text-slate-900 font-bold' : 'text-slate-300 hover:bg-navy-light'}`;
+        btn.onclick = () => {
+          goToPage(pageNum);
+          toggleSidebar();
+        };
+        btn.innerHTML = `<span>${title}</span> <i class="fa-solid fa-angle-right text-[10px] opacity-60"></i>`;
+        list.appendChild(btn);
+      });
+    }
+
+    function goToPage(num) {
+      if (num < 1 || num > totalPages) return;
+      currentPage = num;
+      updatePageVisibility();
+      kirimLog('halaman', pageTitles[num - 1]);
+      document.getElementById('main-content-scroll').scrollTop = 0;
+    }
+
+    function nextPage() {
+      if (currentPage < totalPages) {
+        goToPage(currentPage + 1);
+      }
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        goToPage(currentPage - 1);
+      }
+    }
+
+    function updatePageVisibility() {
+      // Hide all pages
+      for (let i = 1; i <= totalPages; i++) {
+        const el = document.getElementById(`page-${i}`);
+        if (el) el.classList.add('hidden');
+      }
+
+      // Show current page
+      const activeEl = document.getElementById(`page-${currentPage}`);
+      if (activeEl) activeEl.classList.remove('hidden');
+
+      // Update Header & Progress
+      document.getElementById('current-page-num').innerText = currentPage;
+      document.getElementById('footer-page-num').innerText = currentPage;
+      document.getElementById('header-step-title').innerText = pageTitles[currentPage - 1];
+      
+      const pct = (currentPage / totalPages) * 100;
+      document.getElementById('global-progress-bar').style.width = `${pct}%`;
+
+      // Update Prev/Next button states
+      document.getElementById('btn-prev-page').disabled = (currentPage === 1);
+      document.getElementById('btn-next-page').disabled = (currentPage === totalPages);
+
+      // Rebuild sidebar highlight
+      buildSidebarNav();
+    }
+
+    function addScore(pts) {
+      userScore += pts;
+      document.getElementById('global-score').innerText = userScore;
+    }
+
+    /* Page 3: Apersepsi Logic */
+    function checkApersepsi(choice) {
+      kirimLog('apersepsi', 'Memilih ' + choice, choice === 'B');
+      const fb = document.getElementById('apersepsi-feedback');
+      const title = document.getElementById('apersepsi-title');
+      const text = document.getElementById('apersepsi-text');
+      const icon = document.getElementById('apersepsi-icon');
+
+      fb.classList.remove('hidden', 'bg-emerald-950/60', 'border-emerald-500', 'bg-amber-950/60', 'border-amber-500', 'bg-rose-950/60', 'border-rose-500');
+
+      if (choice === 'B') {
+        fb.classList.add('bg-emerald-950/60', 'border-emerald-500');
+        icon.className = 'fa-solid fa-circle-check text-emerald-400';
+        title.className = 'font-bold text-lg text-emerald-400';
+        title.innerText = 'Tepat Sekali! (100%)';
+        text.innerText = 'Pemerintah membiayai fasilitas publik melalui Penerimaan Negara (seperti Pajak, PNBP, Hibah) serta Pembiayaan sah jika terjadi kekurangan anggaran.';
+        addScore(10);
+      } else if (choice === 'A') {
+        fb.classList.add('bg-amber-950/60', 'border-amber-500');
+        icon.className = 'fa-solid fa-triangle-exclamation text-amber-400';
+        title.className = 'font-bold text-lg text-amber-400';
+        title.innerText = 'Hampir Tepat!';
+        text.innerText = 'Pajak adalah porsi terbesar penerimaan negara, tetapi pemerintah juga memiliki penerimaan non-pajak (PNBP) dan sumber pembiayaan lainnya.';
+      } else {
+        fb.classList.add('bg-rose-950/60', 'border-rose-500');
+        icon.className = 'fa-solid fa-circle-xmark text-rose-400';
+        title.className = 'font-bold text-lg text-rose-400';
+        title.innerText = 'Kurang Tepat!';
+        text.innerText = 'Mencetak uang secara tak terbatas dapat memicu inflasi parah. APBN dikelola secara terencana melalui penerimaan resmi.';
+      }
+    }
+
+    /* Page 4: Mater 1 Modal */
+    function toggleOwnWordsModal() {
+      const box = document.getElementById('own-words-box');
+      box.classList.toggle('hidden');
+    }
+
+    function saveOwnWords() {
+      kirimLog('refleksi-singkat', document.getElementById('own-words-input').value);
+      document.getElementById('own-words-saved').classList.remove('hidden');
+      addScore(5);
+    }
+
+    /* Page 5: Card Flip */
+    function flipCard(cardEl) {
+      const front = cardEl.querySelector('.card-front');
+      const back = cardEl.querySelector('.card-back');
+      front.classList.toggle('hidden');
+      back.classList.toggle('hidden');
+    }
+
+    /* Page 6: Tabs */
+    function switchComponentTab(type) {
+      const tabs = ['penerimaan', 'belanja', 'pembiayaan'];
+      tabs.forEach(t => {
+        const content = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === type) {
+          content.classList.remove('hidden');
+          btn.className = 'px-4 py-2.5 rounded-t-lg font-bold text-sm bg-cyan text-slate-900 flex items-center space-x-2 shrink-0';
+        } else {
+          content.classList.add('hidden');
+          btn.className = 'px-4 py-2.5 rounded-t-lg font-bold text-sm bg-navy text-slate-400 hover:text-white flex items-center space-x-2 shrink-0';
+        }
+      });
+    }
+
+    /* Page 7: Game 1 Drag & Drop / Tap Fallback */
+    const g1Items = [
+      { id: 'i1', text: 'Pajak Penghasilan (PPh)', cat: 'PENERIMAAN' },
+      { id: 'i2', text: 'PNBP Dividen BUMN', cat: 'PENERIMAAN' },
+      { id: 'i3', text: 'Penerimaan Hibah', cat: 'PENERIMAAN' },
+      { id: 'i4', text: 'Belanja Pendidikan (KIP)', cat: 'BELANJA' },
+      { id: 'i5', text: 'Belanja Kesehatan (BPJS)', cat: 'BELANJA' },
+      { id: 'i6', text: 'Pembangunan Jalan & Tol', cat: 'BELANJA' },
+      { id: 'i7', text: 'Penerbitan Surat Utang (SBN)', cat: 'PEMBIAYAAN' }
+    ];
+    let selectedTouchCard = null;
+
+    function initGame1() {
+      const pool = document.getElementById('g1-card-pool');
+      pool.innerHTML = '';
+      g1Items.forEach(item => {
+        const card = document.createElement('div');
+        card.id = item.id;
+        card.draggable = true;
+        card.ondragstart = (e) => e.dataTransfer.setData('text/plain', item.id);
+        card.onclick = () => selectCardTap(card);
+        card.className = 'bg-navy-light hover:bg-slate-700 text-slate-100 text-xs font-semibold px-3 py-2 rounded-lg border border-slate-600 cursor-pointer shadow transition-all flex items-center space-x-2 min-h-[40px] select-none';
+        card.innerHTML = `<i class="fa-solid fa-grip-vertical text-slate-400"></i><span>${item.text}</span>`;
+        pool.appendChild(card);
+      });
+    }
+
+    function allowDrop(ev) {
+      ev.preventDefault();
+      ev.currentTarget.classList.add('drag-over');
+    }
+
+    function leaveDrop(ev) {
+      ev.currentTarget.classList.remove('drag-over');
+    }
+
+    function handleDrop(ev, catName) {
+      ev.preventDefault();
+      ev.currentTarget.classList.remove('drag-over');
+      const cardId = ev.dataTransfer.getData('text/plain');
+      moveCardToCategory(cardId, catName);
+    }
+
+    function selectCardTap(cardEl) {
+      if (selectedTouchCard) {
+        selectedTouchCard.classList.remove('ring-2', 'ring-cyan');
+      }
+      selectedTouchCard = cardEl;
+      selectedTouchCard.classList.add('ring-2', 'ring-cyan');
+    }
+
+    // Tap to place fallback
+    document.addEventListener('click', function(e) {
+      if (!selectedTouchCard) return;
+      const zone = e.target.closest('#zone-penerimaan, #zone-belanja, #zone-pembiayaan');
+      if (zone) {
+        let cat = 'PENERIMAAN';
+        if (zone.id === 'zone-belanja') cat = 'BELANJA';
+        if (zone.id === 'zone-pembiayaan') cat = 'PEMBIAYAAN';
+        moveCardToCategory(selectedTouchCard.id, cat);
+        selectedTouchCard.classList.remove('ring-2', 'ring-cyan');
+        selectedTouchCard = null;
+      }
+    });
+
+    function moveCardToCategory(cardId, catName) {
+      const card = document.getElementById(cardId);
+      const zoneMap = { 'PENERIMAAN': 'zone-penerimaan', 'BELANJA': 'zone-belanja', 'PEMBIAYAAN': 'zone-pembiayaan' };
+      const targetZone = document.getElementById(zoneMap[catName]).querySelector('.zone-items');
+      if (card && targetZone) {
+        card.dataset.assignedCat = catName;
+        targetZone.appendChild(card);
+        checkG1Completion();
+      }
+    }
+
+    function checkG1Completion() {
+      const pool = document.getElementById('g1-card-pool');
+      if (pool.children.length === 0) {
+        let correctCount = 0;
+        g1Items.forEach(item => {
+          const card = document.getElementById(item.id);
+          if (card.dataset.assignedCat === item.cat) {
+            correctCount++;
+          }
+        });
+
+        kirimLog('game1-pilah-anggaran', correctCount + ' dari 7 benar', correctCount === 7);
+        const resBox = document.getElementById('g1-result');
+        const badge = document.getElementById('g1-score-badge');
+        const fbText = document.getElementById('g1-feedback-text');
+
+        resBox.classList.remove('hidden');
+        badge.innerText = `${correctCount} / 7 BENAR`;
+
+        if (correctCount === 7) {
+          fbText.innerText = 'Sempurna! Kamu telah memahami dengan baik seluruh komponen penerimaan, belanja, dan pembiayaan negara.';
+          addScore(30);
+          confetti({ particleCount: 50, spread: 60 });
+        } else {
+          fbText.innerText = `Kamu berhasil mengelompokkan ${correctCount} item dengan benar. Cek kembali item yang kurang tepat!`;
+          addScore(correctCount * 3);
+        }
+      }
+    }
+
+    function resetGame1() {
+      document.getElementById('g1-result').classList.add('hidden');
+      initGame1();
+    }
+
+    /* Page 8: Game 2 Allocator */
+    function updateG2Allocations(sector) {
+      const sectors = ['pendidikan', 'kesehatan', 'infrastruktur', 'pertahanan', 'lingkungan'];
+      let total = 0;
+      sectors.forEach(s => {
+        const val = parseInt(document.getElementById(`slider-${s}`).value);
+        document.getElementById(`val-${s}`).innerText = `${val} Poin`;
+        total += val;
+      });
+
+      const left = 100 - total;
+      const leftEl = document.getElementById('g2-points-left');
+      leftEl.innerText = left;
+      if (left < 0) {
+        leftEl.className = 'text-2xl font-extrabold font-mono text-rose-500 animate-bounce';
+      } else {
+        leftEl.className = 'text-2xl font-extrabold font-mono text-cyan';
+      }
+    }
+
+    function submitG2Allocation() {
+      const box = document.getElementById('g2-feedback-box');
+      const text = document.getElementById('g2-analysis-text');
+      box.classList.remove('hidden');
+
+      const pend = parseInt(document.getElementById('slider-pendidikan').value);
+      const kes = parseInt(document.getElementById('slider-kesehatan').value);
+      kirimLog('game2-alokasi', ['pendidikan','kesehatan','infrastruktur','pertahanan','lingkungan']
+        .map(k => k + '=' + document.getElementById('slider-' + k).value).join(', '));
+
+      if (pend >= 20 && kes >= 20) {
+        text.innerText = 'Prioritas Seimbang! Alokasimu memenuhi amanat pemenuhan layanan dasar pendidikan dan kesehatan masyarakat.';
+      } else {
+        text.innerText = 'Alokasi Unik! Kamu memprioritaskan pertumbuhan fisik/keamanan. Ingat, sektor layanan dasar tetap membutuhkan porsi berkelanjutan.';
+      }
+      addScore(20);
+    }
+
+    /* Page 9: Game 3 Quiz Statements */
+    const g3Data = [
+      { q: "1. APBN hanya berisi pengeluaran rutin pemerintah saja.", a: false, exp: "Salah. APBN memuat Penerimaan, Belanja, dan Pembiayaan." },
+      { q: "2. Pajak merupakan sumber penerimaan negara terbesar.", a: true, exp: "Benar. Lebih dari 70% penerimaan APBN berasal dari pajak." },
+      { q: "3. Belanja pendidikan tidak ada hubungannya dengan masyarakat.", a: false, exp: "Salah. Belanja pendidikan berdampak langsung pada beasiswa & fasilitas belajar." },
+      { q: "4. APBN digunakan sebagai instrumen kebijakan fiskal.", a: true, exp: "Benar. APBN mengatur penerimaan & belanja untuk kestabilan ekonomi." }
+    ];
+
+    function initGame3() {
+      const container = document.getElementById('g3-statements-list');
+      container.innerHTML = '';
+      g3Data.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'bg-navy p-4 rounded-xl border border-slate-700 space-y-2';
+        div.innerHTML = `
+          <p class="text-sm font-semibold text-white">${item.q}</p>
+          <div class="flex space-x-2">
+            <button onclick="answerG3(${idx}, true)" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold min-h-[40px]">BENAR</button>
+            <button onclick="answerG3(${idx}, false)" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold min-h-[40px]">SALAH</button>
+          </div>
+          <p id="g3-exp-${idx}" class="text-xs hidden mt-2"></p>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function answerG3(idx, userAns) {
+      const expEl = document.getElementById(`g3-exp-${idx}`);
+      kirimLog('game3-benar-salah', 'Pernyataan ' + (idx + 1) + ': jawab ' + (userAns ? 'BENAR' : 'SALAH'), userAns === g3Data[idx].a);
+      expEl.classList.remove('hidden');
+      if (userAns === g3Data[idx].a) {
+        expEl.className = 'text-xs mt-2 text-emerald-400 font-medium';
+        expEl.innerText = `✓ Tepat! ${g3Data[idx].exp}`;
+        addScore(5);
+      } else {
+        expEl.className = 'text-xs mt-2 text-rose-400 font-medium';
+        expEl.innerText = `✕ Belum Tepat. ${g3Data[idx].exp}`;
+      }
+    }
+
+    /* Page 10: Case Problem */
+    function selectCaseProblem(type) {
+      const matrix = document.getElementById('case-analysis-matrix');
+      const title = document.getElementById('case-selected-title');
+      matrix.classList.remove('hidden');
+
+      const labels = {
+        sekolah: "Analisis Masalah: Fasilitas Sekolah Rusak",
+        kesehatan: "Analisis Masalah: Layanan Kesehatan Belum Merata",
+        jalan: "Analisis Masalah: Jalan Rusak",
+        ekonomi: "Analisis Masalah: Ekonomi Melambat"
+      };
+      title.innerText = labels[type];
+      kasusTerpilih = type;
+      kirimLog('studi-kasus-pilih', labels[type]);
+    }
+
+    function submitCaseAnalysis() {
+      kirimLog('studi-kasus-analisis', '[' + kasusTerpilih + '] Pos anggaran: ' + document.getElementById('case-q1').value + ' | Dampak: ' + document.getElementById('case-q2').value);
+      document.getElementById('case-saved-msg').classList.remove('hidden');
+      addScore(15);
+    }
+
+    /* Page 11: Minister Proposal */
+    function selectMinisterProposal(prop) {
+      kirimLog('menteri-keuangan', 'Memilih proposal ' + prop);
+      const box = document.getElementById('minister-outcome');
+      const title = document.getElementById('minister-outcome-title');
+      const text = document.getElementById('minister-outcome-text');
+      box.classList.remove('hidden');
+
+      if (prop === 'A') {
+        title.innerText = 'Konsekuensi Proposal A (Pendidikan):';
+        text.innerText = 'Kualitas SDM jangka panjang meningkat pesat, namun butuh waktu untuk melihat dampak langsung pada ekonomi fisik.';
+      } else if (prop === 'B') {
+        title.innerText = 'Konsekuensi Proposal B (Kesehatan):';
+        text.innerText = 'Kesejahteraan & produktivitas warga terjaga baik, tetapi kebutuhan infrastruktur jalan tetap memerlukan alokasi lanjutan.';
+      } else {
+        title.innerText = 'Konsekuensi Proposal C (Infrastruktur):';
+        text.innerText = 'Konektivitas dan laju ekonomi meningkat cepat, namun pemerataan kualitas sosial tetap harus didampingi.';
+      }
+      addScore(20);
+    }
+
+    /* Page 12: Fiscal Policy */
+    function toggleFiscalPolicy(type) {
+      const btnExp = document.getElementById('btn-fisc-exp');
+      const btnCon = document.getElementById('btn-fisc-con');
+      const title = document.getElementById('fisc-title');
+      const desc = document.getElementById('fisc-desc');
+
+      if (type === 'exp') {
+        btnExp.className = 'p-3 rounded-lg bg-cyan text-slate-900 font-bold text-xs min-h-[44px]';
+        btnCon.className = 'p-3 rounded-lg bg-navy-light text-slate-300 font-bold text-xs hover:text-white min-h-[44px]';
+        title.innerText = 'Kebijakan Fiskal Ekspansif';
+        desc.innerText = 'Dilakukan saat ekonomi lesu: Mendorong belanja negara & memotong pajak agar daya beli warga meningkat.';
+      } else {
+        btnCon.className = 'p-3 rounded-lg bg-cyan text-slate-900 font-bold text-xs min-h-[44px]';
+        btnExp.className = 'p-3 rounded-lg bg-navy-light text-slate-300 font-bold text-xs hover:text-white min-h-[44px]';
+        title.innerText = 'Kebijakan Fiskal Kontraktif';
+        desc.innerText = 'Dilakukan saat inflasi tinggi: Mengurangi belanja negara & menaikkan pajak untuk menekan laju kenaikan harga.';
+      }
+    }
+
+    /* Pages 13-16: HOTS Level Handlers */
+    function checkHots1(ans) {
+      kirimLog('hots1', 'Memilih ' + ans, ans === 'B');
+      const fb = document.getElementById('hots1-feedback');
+      fb.classList.remove('hidden');
+      if (ans === 'B') {
+        fb.className = 'mt-4 p-4 rounded-xl text-xs leading-relaxed bg-emerald-950/60 border border-emerald-500 text-emerald-300';
+        fb.innerText = '✓ Tepat! Peningkatan belanja proyek publik menciptakan penyerapan tenaga kerja dan efek pengganda ekonomi.';
+        addScore(15);
+      } else {
+        fb.className = 'mt-4 p-4 rounded-xl text-xs leading-relaxed bg-rose-950/60 border border-rose-500 text-rose-300';
+        fb.innerText = '✕ Kurang tepat. Belanja pemerintah ditujukan untuk menggerakkan sektor riil publik.';
+      }
+    }
+
+    function checkHots2(ans) {
+      kirimLog('hots2', 'Memilih ' + ans, ans === 'B');
+      const fb = document.getElementById('hots2-feedback');
+      fb.classList.remove('hidden');
+      if (ans === 'B') {
+        fb.className = 'mt-4 p-4 rounded-xl text-xs leading-relaxed bg-emerald-950/60 border border-emerald-500 text-emerald-300';
+        fb.innerText = '✓ Tepat! Ketidakefisienan alokasi memutus rantai manfaat ekonomi belanja publik.';
+        addScore(15);
+      } else {
+        fb.className = 'mt-4 p-4 rounded-xl text-xs leading-relaxed bg-rose-950/60 border border-rose-500 text-rose-300';
+        fb.innerText = '✕ Kurang tepat. Pertimbangkan keterkaitan efektivitas anggaran dengan kemanfaatan publik.';
+      }
+    }
+
+    function checkHots3(ans) {
+      kirimLog('hots3', 'Memilih ' + ans, ans === 'B');
+      const fb = document.getElementById('hots3-feedback');
+      fb.classList.remove('hidden');
+      if (ans === 'B') {
+        fb.className = 'mt-4 p-4 rounded-xl text-xs leading-relaxed bg-emerald-950/60 border border-emerald-500 text-emerald-300';
+        fb.innerText = '✓ Tepat! Keputusan anggaran menuntut evaluasi kritis atas prioritas dan kondisi riil masyarakat.';
+        addScore(15);
+      } else {
+        fb.className = 'mt-4 p-4 rounded-xl text-xs leading-relaxed bg-rose-950/60 border border-rose-500 text-rose-300';
+        fb.innerText = '✕ Kurang tepat. Prioritas fiskal tidak bersifat absolut tunggal.';
+      }
+    }
+
+    function checkHots4(ans) {
+      kirimLog('hots4', 'Memilih ' + ans, ans === 'B');
+      const fb = document.getElementById('hots4-feedback');
+      fb.classList.remove('hidden');
+      if (ans === 'B') {
+        fb.className = 'mt-4 p-4 rounded-xl text-xs leading-relaxed bg-emerald-950/60 border border-emerald-500 text-emerald-300';
+        fb.innerText = '✓ Tepat! Kombinasi realokasi terukur adalah strategi fiskal paling responsif pada masa sulit.';
+        addScore(15);
+      } else {
+        fb.className = 'mt-4 p-4 rounded-xl text-xs leading-relaxed bg-rose-950/60 border border-rose-500 text-rose-300';
+        fb.innerText = '✕ Kurang tepat. Pikirkan fleksibilitas kombinasi instrumen APBN.';
+      }
+    }
+
+    /* Page 17: Quiz Engine */
+    const quizData = [
+      { q: "Rencana keuangan tahunan pemerintah negara yang disetujui DPR disebut...", options: ["APBD", "APBN", "Nota Keuangan", "BPN"], a: 1 },
+      { q: "Fungsi APBN yang berkaitan dengan penyediaan barang publik seperti jalan dan sekolah adalah...", options: ["Distribusi", "Stabilisasi", "Alokasi", "Otorisasi"], a: 2 },
+      { q: "Sumber penerimaan negara berikut yang termasuk PNBP adalah...", options: ["PPN", "PPh", "Dividen BUMN", "Bea Masuk"], a: 2 },
+      { q: "Pengeluaran negara untuk bantuan sosial PKH termasuk pelaksanaan fungsi APBN...", options: ["Distribusi", "Otorisasi", "Perencanaan", "Pengawasan"], a: 0 },
+      { q: "Langkah fiskal ekspansif yang diambil pemerintah saat ekonomi lesu adalah...", options: ["Menurunkan belanja", "Menaikkan pajak", "Meningkatkan belanja publik", "Menghentikan proyek"], a: 2 },
+      { q: "Pembiayaan anggaran digunakan ketika APBN mengalami kondisi...", options: ["Surplus", "Defisit", "Seimbang", "Nihil"], a: 1 },
+      { q: "Mana yang merupakan pos belanja fungsi pendidikan?", options: ["Alutsista", "Beasiswa KIP", "BPJS", "Jalan Tol"], a: 1 },
+      { q: "Efek pengganda dari belanja infrastruktur bertujuan untuk...", options: ["Mengurangi pengangguran & dorong produksi", "Menambah utang", "Menutup sekolah", "Menaikkan tarif"], a: 0 },
+      { q: "Pengawasan APBN oleh BPK dan DPR memastikan kegiatan sesuai fungsi...", options: ["Perencanaan", "Pengawasan", "Alokasi", "Stabilisasi"], a: 1 },
+      { q: "Hasil evaluasi APBN harus mengutamakan...", options: ["Kepentingan pejabat", "Dampak kesejahteraan masyarakat", "Jumlah halaman dokumen", "Keuntungan BUMN saja"], a: 1 }
+    ];
+
+    let currentQuizIndex = 0;
+
+    function initQuiz() {
+      renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+      const box = document.getElementById('quiz-box');
+      document.getElementById('quiz-curr-num').innerText = currentQuizIndex + 1;
+      const q = quizData[currentQuizIndex];
+
+      box.innerHTML = `
+        <div class="bg-navy p-5 rounded-xl border border-slate-700">
+          <p class="text-sm font-bold text-white mb-4">${currentQuizIndex + 1}. ${q.q}</p>
+          <div class="space-y-2.5">
+            ${q.options.map((opt, i) => `
+              <button onclick="submitQuizAns(${i})" class="w-full text-left p-3.5 rounded-lg bg-navy-light hover:bg-slate-700 border border-slate-600 text-xs text-slate-200 transition-all min-h-[48px]">
+                ${String.fromCharCode(65 + i)}. ${opt}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function submitQuizAns(userIdx) {
+      const q = quizData[currentQuizIndex];
+      kuisDijawab++;
+      if (userIdx === q.a) kuisBenar++;
+      kirimLog('kuis', 'No ' + (currentQuizIndex + 1) + ': jawab ' + String.fromCharCode(65 + userIdx), userIdx === q.a);
+      if (userIdx === q.a) {
+        addScore(10);
+      }
+
+      if (currentQuizIndex < quizData.length - 1) {
+        currentQuizIndex++;
+        renderQuizQuestion();
+      } else {
+        finalizeLearningResults();
+        goToPage(18);
+      }
+    }
+
+    /* Page 18: Results Calculation */
+    function finalizeLearningResults() {
+      sudahSelesai = true;
+      kirimLog('selesai', 'Kuis akhir selesai. Skor akhir ' + userScore);
+      document.getElementById('final-score-val').innerText = userScore;
+      const title = document.getElementById('final-badge-title');
+      const desc = document.getElementById('final-badge-desc');
+
+      if (userScore >= 120) {
+        title.innerText = "🏆 Ahli Strategi Anggaran";
+        desc.innerText = "Luar biasa! Pemahamanmu terhadap APBN, instrumen fiskal, dan pengambilan keputusan publik sangat tajam.";
+      } else if (userScore >= 90) {
+        title.innerText = "💼 Analis APBN Muda";
+        desc.innerText = "Sangat baik! Kamu telah menguasai komponen dasar APBN dan mampu menganalisis hubungan belanja negara.";
+      } else {
+        title.innerText = "🔍 Penjelajah APBN";
+        desc.innerText = "Bagus! Kamu sudah memahami konsep dasar. Mari ulas kembali modul permainan untuk mempertajam analisismu.";
+      }
+    }
+
+    /* Page 19: Reflection Copy */
+    function copyReflection() {
+      const r1 = document.getElementById('ref1').value;
+      const r2 = document.getElementById('ref2').value;
+      const r3 = document.getElementById('ref3').value;
+
+      kirimLog('refleksi', '1) ' + r1 + ' | 2) ' + r2 + ' | 3) ' + r3);
+      const summary = `--- RANGKUMAN REFLEKSI APBN ---\n1. Hal baru: ${r1}\n2. Hubungan anggaran: ${r2}\n3. Pertimbangan menteri: ${r3}`;
+      
+      const el = document.createElement('textarea');
+      el.value = summary;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+
+      document.getElementById('ref-copy-msg').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
